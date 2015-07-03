@@ -8,29 +8,29 @@
   var SOCKET_ERROR = 'error';
   var SOCKET_USER_MESSAGE = 'user message';
   var SOCKET_USER_REGISTRATION = 'user registration';
-  var SOCKET_USER_REGISTRATION_COMPLETE = 'registration complete';
-
+  var USER_LIST_UPDATES = 'update username list';
+  var USER_MENTIONED = 'mentions';
 
 
   var SYSTEM = 'System';
   var socket = io.connect(SERVER_ADDRESS);
 
 
-  socket.on(SOCKET_CONNECT, function(){
-    message(SYSTEM, 'Connected to ' + SERVER_ADDRESS)
-  })
+  // socket.on(SOCKET_CONNECT, function(){
+  //   message(SYSTEM, 'Connected to ' + SERVER_ADDRESS)
+  // })
 
-  socket.on(SOCKET_DISCONNECT, function(){
-    message(SYSTEM, 'Disconnect from ' + SERVER_ADDRESS)
-  })
+  // socket.on(SOCKET_DISCONNECT, function(){
+  //   message(SYSTEM, 'Disconnect from ' + SERVER_ADDRESS)
+  // })
 
-  socket.on(SOCKET_RECONNECT, function(){
-    message(SYSTEM, 'Reconnected to ' + SERVER_ADDRESS)
-  })
+  // socket.on(SOCKET_RECONNECT, function(){
+  //   message(SYSTEM, 'Reconnected to ' + SERVER_ADDRESS)
+  // })
 
-  socket.on(SOCKET_RECONNECTING, function(){
-    message(SYSTEM, 'Reconnecting to ' + SERVER_ADDRESS)
-  })
+  // socket.on(SOCKET_RECONNECTING, function(){
+  //   message(SYSTEM, 'Reconnecting to ' + SERVER_ADDRESS)
+  // })
 
   socket.on(SOCKET_ERROR, function(){
     if(err !== undefined){
@@ -44,10 +44,13 @@
     message(from, userMessage)
   })
 
-  socket.on(SOCKET_USER_REGISTRATION_COMPLETE, function (username){
-    addUserToUsersOnlineList(username);
+  socket.on(USER_LIST_UPDATES, function (usernameList){
+    updateUserLst(usernameList);
   })
 
+  socket.on(USER_MENTIONED, function (){
+    console.log('a mention');
+  });
 
 
 
@@ -72,8 +75,6 @@
 
     var messageField = $('#message');
     var theMessage = messageField.val();
-
-    // message('me', theMessage);
 
     socket.emit(SOCKET_USER_MESSAGE, theMessage)
 
@@ -118,12 +119,11 @@
     registration.hide();
   };
 
-  function addUserToUsersOnlineList(usernameList){
+  function updateUserLst(usernameList){
 
+    var userList = $('#userlist');
 
-      var userList = $('#userlist');
-
-      userList.empty();
+    userList.empty();
 
     for(key in usernameList){
       usernameList[key]
@@ -132,12 +132,8 @@
       });
 
       userList.append(userListBox);
-
-
     }
-
-
-    }
+  }
 
 
 
