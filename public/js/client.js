@@ -7,12 +7,11 @@
   var SOCKET_RECONNECTING = 'reconnecting';
   var SOCKET_ERROR = 'error';
   var SOCKET_USER_MESSAGE = 'user message';
-
+  var SOCKET_USER_REGISTRATION = 'user registration';
 
 
   var SYSTEM = 'System';
   var socket = io.connect(SERVER_ADDRESS);
-
 
 
   socket.on(SOCKET_CONNECT, function(){
@@ -38,6 +37,11 @@
       message(SYSTEM, 'An unknown error occured');
     }
   })
+
+  socket.on(SOCKET_USER_MESSAGE, function (from, userMessage){
+    message(from, userMessage)
+  })
+
 
 
   function message(from, message){
@@ -71,9 +75,35 @@
   });
 
 
+  $('#registration_form').submit(function(){
+
+    var username = $('#username').val();
+
+    console.log('username', username);
+
+    socket.emit(SOCKET_USER_REGISTRATION, username, function (available){
+
+      if (available){
+        changeStateOfChatRoom();
+      }
+      else{
+        $('#username_error').text('Username has been taken!');
+      }
+    });
+
+    return false;
+  });
 
 
+  var registration = $('#registration');
+  var chatRoom = $('#chatroom');
 
+  chatRoom.hide();
+
+  function changeStateOfChatRoom (){
+    chatRoom.show();
+    registration.hide();
+  };
 
 
 
