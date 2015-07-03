@@ -8,7 +8,7 @@
 <body>
 
 <div id="registration">
-  <h2>Enter a username</h2>
+  <h2>Please type in your nickname and press enter</h2>
   <h3 id="username_error" class="error"></h3>
   <form action="" id="registration_form">
     <input type="text" id="username">
@@ -17,16 +17,23 @@
 </div>
 
 
-  <div id="chatroom">
-    <div id="chatlog"></div>
+<div id="chatroom">
+  <div id="chatlog"></div>
+  <form id="messageform">
+    <input type="text" id="message"
+    placeholder="Message...">
+    <button id="send">Send</button>
+  </form>
+</div>
 
-    <form id="messageform">
-      <input type="text" id="message"
-      placeholder="Message...">
-      <button id="send">Send</button>
-
-    </form>
+<div id="usersonline">
+  <h3>Users Online</h3>
+  <div id="userhouse">
+    <ul id="userlist"></ul>
   </div>
+
+</div>
+
 
   <script src="bower_components/jquery/dist/jquery.min.js"></script>
   <script src="bower_components/socket.io-client/socket.io.js"></script>

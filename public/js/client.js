@@ -8,6 +8,8 @@
   var SOCKET_ERROR = 'error';
   var SOCKET_USER_MESSAGE = 'user message';
   var SOCKET_USER_REGISTRATION = 'user registration';
+  var SOCKET_USER_REGISTRATION_COMPLETE = 'registration complete';
+
 
 
   var SYSTEM = 'System';
@@ -42,6 +44,12 @@
     message(from, userMessage)
   })
 
+  socket.on(SOCKET_USER_REGISTRATION_COMPLETE, function (username){
+    addUserToUsersOnlineList(username);
+  })
+
+
+
 
 
   function message(from, message){
@@ -65,7 +73,7 @@
     var messageField = $('#message');
     var theMessage = messageField.val();
 
-    message('User', theMessage);
+    // message('me', theMessage);
 
     socket.emit(SOCKET_USER_MESSAGE, theMessage)
 
@@ -95,15 +103,41 @@
   });
 
 
+
+
   var registration = $('#registration');
   var chatRoom = $('#chatroom');
+  var usersOnline = $('#usersonline');
 
   chatRoom.hide();
+  usersOnline.hide();
 
   function changeStateOfChatRoom (){
     chatRoom.show();
+    usersOnline.show();
     registration.hide();
   };
+
+  function addUserToUsersOnlineList(usernameList){
+
+
+      var userList = $('#userlist');
+
+      userList.empty();
+
+    for(key in usernameList){
+      usernameList[key]
+      var userListBox = $('<li>', {
+        text : usernameList[key]
+      });
+
+      userList.append(userListBox);
+
+
+    }
+
+
+    }
 
 
 
