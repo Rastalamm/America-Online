@@ -18,9 +18,41 @@
     message(SYSTEM, 'Connected to ' + SERVER_ADDRESS)
   })
 
+  socket.on(SOCKET_DISCONNECT, function(){
+    message(SYSTEM, 'Disconnect from ' + SERVER_ADDRESS)
+  })
+
+  socket.on(SOCKET_RECONNECT, function(){
+    message(SYSTEM, 'Reconnected to ' + SERVER_ADDRESS)
+  })
+
+  socket.on(SOCKET_RECONNECTING, function(){
+    message(SYSTEM, 'Reconnecting to ' + SERVER_ADDRESS)
+  })
+
+  socket.on(SOCKET_ERROR, function(){
+    if(err !== undefined){
+      message(SYSTEM, err);
+    }else{
+      message(SYSTEM, 'An unknown error occured');
+    }
+  })
 
 
+  function message(from, message){
+      var newMessage = $('<p>');
+      var fromTag = $('<b>', {
+        text : from
+      });
+      var messageTag = $('<span>', {
+        text : message
+      });
 
+
+      newMessage.append(fromTag);
+      newMessage.append(messageTag);
+    //$('#chatlog').append(newMessage).get(0).scrollTop = 1000000000;
+  }
 
 
 
