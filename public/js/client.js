@@ -6,6 +6,7 @@
   var SOCKET_RECONNECT = 'reconnect';
   var SOCKET_RECONNECTING = 'reconnecting';
   var SOCKET_ERROR = 'error';
+  var SOCKET_USER_MESSAGE = 'user message';
 
 
 
@@ -51,9 +52,23 @@
 
       newMessage.append(fromTag);
       newMessage.append(messageTag);
-    //$('#chatlog').append(newMessage).get(0).scrollTop = 1000000000;
+    $('#chatlog').append(newMessage).get(0).scrollTop = 1000000000;
   }
 
+
+  $('#messageform').submit(function(){
+
+    var messageField = $('#message');
+    var theMessage = messageField.val();
+
+    message('User', theMessage);
+
+    socket.emit(SOCKET_USER_MESSAGE, theMessage)
+
+    messageField.val('');
+
+    return false;
+  });
 
 
 
