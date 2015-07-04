@@ -67,45 +67,44 @@ server.sockets.on(SOCKET_CONNECTION, function (socket){
 });
 
 function rateChecker(message, socket){
-    socket.timeCheck.unshift(Date.now())
+  socket.timeCheck.unshift(Date.now())
 
-    if(socket.timeCheck.length > 4){
-      if(socket.timeCheck[0] - socket.timeCheck[4] < 5000){
+  if(socket.timeCheck.length > 4){
+    if(socket.timeCheck[0] - socket.timeCheck[4] < 5000){
 
-        socket.strikes += 1
+      socket.strikes += 1
 
-        switch (socket.strikes){
+      switch (socket.strikes){
 
-          case 1:
-          socket.emit(SOCKET_USER_MESSAGE, SERVER_USER, 'Too many too quick, wait 5 seconds')
-          break;
+        case 1:
+        socket.emit(SOCKET_USER_MESSAGE, SERVER_USER, 'Too many too quick, wait 5 seconds')
+        break;
 
-          case 2:
-          socket.emit(SOCKET_USER_MESSAGE, SERVER_USER, 'I\'m warning you...')
-          break;
+        case 2:
+        socket.emit(SOCKET_USER_MESSAGE, SERVER_USER, 'I\'m warning you...')
+        break;
 
-          case 3:
-          socket.emit(SOCKET_USER_MESSAGE, SERVER_USER, 'strikeout!')
-          kickOutUser(socket.username, 'sent too many messages too quickly.', socket);
-          break;
+        case 3:
+        socket.emit(SOCKET_USER_MESSAGE, SERVER_USER, 'strikeout!')
+        kickOutUser(socket.username, 'sent too many messages too quickly.', socket);
+        break;
 
-          default:
-          process.stdout.write(socket.username + ' impossible!');
-        }
-
-        //Messages to the socket
-        socket.emit(SOCKET_USER_MESSAGE, socket.username, message);
-
-      }else{
-        //sends the messages back to everyone
-      server.emit(SOCKET_USER_MESSAGE, socket.username, message)
+        default:
+        process.stdout.write(socket.username + ' impossible!');
       }
+
+      //Messages to the socket
+      socket.emit(SOCKET_USER_MESSAGE, socket.username, message);
+
     }else{
       //sends the messages back to everyone
-      server.emit(SOCKET_USER_MESSAGE, socket.username, message)
-
+    server.emit(SOCKET_USER_MESSAGE, socket.username, message)
     }
+  }else{
+    //sends the messages back to everyone
+    server.emit(SOCKET_USER_MESSAGE, socket.username, message)
   }
+}
 
 
 function adminMessageOut(socket){
