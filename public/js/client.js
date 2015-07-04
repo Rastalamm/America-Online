@@ -41,16 +41,17 @@
   })
 
   socket.on(SOCKET_USER_MESSAGE, function (from, userMessage){
-    message(from, userMessage)
+
+    checkForMention(from, userMessage);
   })
 
-  socket.on(USER_LIST_UPDATES, function (usernameList){
+var clientUsername;
+
+  socket.on(USER_LIST_UPDATES, function (usernameList, username){
+
     updateUserLst(usernameList);
   })
 
-  socket.on(USER_MENTIONED, function (){
-    console.log('a mention');
-  });
 
 
 
@@ -61,7 +62,7 @@
         text : from
       });
       var messageTag = $('<span>', {
-        text : message
+        html : message
       });
 
 
@@ -84,15 +85,35 @@
   });
 
 
+  function checkForMention (from, userMessage){
+
+    var myUN = '@' + clientUsername;
+
+    var mentionSpan = $('<span>',{
+      text : clientUsername,
+      class : 'mention'
+    });
+
+    replaced = userMessage.replace(myUN, mentionSpan.get(0).outerHTML );
+
+    message(from, replaced)
+
+  }
+
+  function addMentionSpan (){
+
+  }
+
+
   $('#registration_form').submit(function(){
 
     var username = $('#username').val();
 
-    console.log('username', username);
 
     socket.emit(SOCKET_USER_REGISTRATION, username, function (available){
 
       if (available){
+        clientUsername = username
         changeStateOfChatRoom();
       }
       else{

@@ -9,6 +9,9 @@
   border: 1px solid black;
 }
 
+
+
+
 .error {
     -webkit-animation-name: blinker;
     -webkit-animation-duration: 1s;
@@ -50,4 +53,9 @@
   height: 500px;
   overflow: auto;
 
+}
+
+.mention{
+  font-weight: 700;
+  color: red;
 }
