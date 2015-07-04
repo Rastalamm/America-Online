@@ -61,7 +61,7 @@
   function message(from, message){
       var newMessage = $('<p>');
       var fromTag = $('<b>', {
-        text : from
+        text : from + ':'
       });
       var messageTag = $('<span>', {
         html : message
@@ -88,10 +88,10 @@
 
   function checkForMention (from, userMessage){
 
-    var findThisUn = '@' + clientUsername;
+    var findThisUn = '@' + clientUsername + ' ';
 
     var mentionSpan = $('<span>',{
-      text : clientUsername,
+      text : clientUsername + ' ',
       class : 'mention'
     });
 

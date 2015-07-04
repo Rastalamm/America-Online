@@ -23,63 +23,15 @@ server.sockets.on(SOCKET_CONNECTION, function (socket){
   //adds an array of the time of the messages to each socket
   socket.timeCheck = [];
   socket.strikes = 0;
+
   socket.on(SOCKET_USER_MESSAGE, function (message){
 
-
-    rateChecker(message)
-
-
+    rateChecker(message, socket)
 
   })
 
 
-  function rateChecker(message){
-    socket.timeCheck.unshift(Date.now())
 
-    if(socket.timeCheck.length > 4){
-      if(socket.timeCheck[0] - socket.timeCheck[4] < 5000){
-        console.log('too many too quick');
-        //kicks them out
-        //kickOutUser(socket.username, 'too many', socket)
-        socket.strikes += 1
-        //Messages for everyone else - not using
-        //socket.broadcast.emit(SOCKET_USER_MESSAGE, socket.username, 'has sent too many messages too quickly and needs to wait.')
-
-
-
-        switch (socket.strikes){
-
-          case 1:
-          socket.emit(SOCKET_USER_MESSAGE, SERVER_USER, 'Too many too quick, wait 5 seconds')
-          break;
-
-          case 2:
-          socket.emit(SOCKET_USER_MESSAGE, SERVER_USER, 'I\'m warning you...!')
-          break;
-
-          case 3:
-          socket.emit(SOCKET_USER_MESSAGE, SERVER_USER, 'strikeout!')
-          socket.strikes = 0;
-          //kickOutUser(socket.username, 'sent too many messages too quickly.');
-          break;
-
-          default:
-          socket.emit(SOCKET_USER_MESSAGE, SERVER_USER, 'strikeout!');
-        }
-
-        //Messages to the socket
-        socket.emit(SOCKET_USER_MESSAGE, socket.username, message);
-
-      }else{
-        //sends the messages back to everyone
-      server.emit(SOCKET_USER_MESSAGE, socket.username, message)
-      }
-    }else{
-      //sends the messages back to everyone
-      server.emit(SOCKET_USER_MESSAGE, socket.username, message)
-
-    }
-  }
 
 
   socket.on(SOCKET_USER_REGISTRATION, function(username, callback){
@@ -113,6 +65,48 @@ server.sockets.on(SOCKET_CONNECTION, function (socket){
   })
 
 });
+
+function rateChecker(message, socket){
+    socket.timeCheck.unshift(Date.now())
+
+    if(socket.timeCheck.length > 4){
+      if(socket.timeCheck[0] - socket.timeCheck[4] < 5000){
+
+        socket.strikes += 1
+
+        switch (socket.strikes){
+
+          case 1:
+          socket.emit(SOCKET_USER_MESSAGE, SERVER_USER, 'Too many too quick, wait 5 seconds')
+          break;
+
+          case 2:
+          socket.emit(SOCKET_USER_MESSAGE, SERVER_USER, 'I\'m warning you...')
+          break;
+
+          case 3:
+          socket.emit(SOCKET_USER_MESSAGE, SERVER_USER, 'strikeout!')
+          kickOutUser(socket.username, 'sent too many messages too quickly.', socket);
+          break;
+
+          default:
+          process.stdout.write(socket.username + ' impossible!');
+        }
+
+        //Messages to the socket
+        socket.emit(SOCKET_USER_MESSAGE, socket.username, message);
+
+      }else{
+        //sends the messages back to everyone
+      server.emit(SOCKET_USER_MESSAGE, socket.username, message)
+      }
+    }else{
+      //sends the messages back to everyone
+      server.emit(SOCKET_USER_MESSAGE, socket.username, message)
+
+    }
+  }
+
 
 function adminMessageOut(socket){
 
@@ -154,7 +148,7 @@ function kickOutUser(user, message, socket){
   if(socket.username === user){
 
     //emits a message to all other users who was kicked out and why
-    server.emit(SOCKET_USER_MESSAGE, SERVER_USER, user + ' was kicked out bec/ they ' + message);
+    server.emit(SOCKET_USER_MESSAGE, SERVER_USER, socket.username + ' was kicked out bec/ they ' + message);
 
     //need to change the users page
     socket.emit(KICKED_OUT_USER, user, message)
@@ -162,10 +156,9 @@ function kickOutUser(user, message, socket){
     //writes a message to the server
     process.stdout.write('IP: ' + socket.handshake.address + ' has been kicked out \n');
 
-    //Add the IP to blacklist IP's
+    //Add the IP and username to blacklist
     blackListIp.push(socket.handshake.address)
-    //blackListUserNamess.push(user);
-
+    blackListUserNamess.push(user);
 
     //removes user from all other lists
     socket.broadcast.emit(USER_LIST_UPDATES, usernameList);
@@ -174,27 +167,4 @@ function kickOutUser(user, message, socket){
 
 
 
-
-
-
 }
-
-
-//WIll use to auto kick ppl out
-// function autoRemove(socket, data){
-
-//   socket.timeCheck.unshift(Date.now())
-
-//   console.log(socket.timeCheck);
-
-//   if(socket.timeCheck.length > 4){
-//     if(socket.timeCheck[0] - socket.timeCheck[4] < 5000){
-//       blackList.push(clientConnectedList[socket.remotePort].username);
-//       socket.end('removed');
-//     }else{
-//       writeMessages(socket, data);
-//     }
-//   }else{
-//     writeMessages(socket, data);
-//   }
-// }
