@@ -23,17 +23,50 @@ server.sockets.on(SOCKET_CONNECTION, function (socket){
   //adds an array of the time of the messages to each socket
   socket.timeCheck = [];
   socket.strikes = 0;
+
   socket.on(SOCKET_USER_MESSAGE, function (message){
 
-
-    rateChecker(message)
-
-
+    rateChecker(message, socket)
 
   })
 
 
-  function rateChecker(message){
+
+
+
+  socket.on(SOCKET_USER_REGISTRATION, function(username, callback){
+    if( usernameList.hasOwnProperty(username) || username === '' ){
+      callback(false);
+    }else{
+
+      usernameList[username] = username;
+
+      socket.username = username;
+
+      server.emit(SOCKET_USER_MESSAGE, SERVER_USER, username + ' joined')
+
+      callback(true);
+      console.log('New User: ', socket.username);
+
+    server.emit(USER_LIST_UPDATES, usernameList);
+    }
+  });
+
+
+  socket.on(SOCKET_DISCONNECT, function(){
+    //removes the socket
+    delete(usernameList[socket.username]);
+    //sends a message to all users that they left
+    if( socket.username !== undefined){
+      socket.broadcast.emit(SOCKET_USER_MESSAGE, SERVER_USER, socket.username + ' has left the building.')
+    }
+    //updates the userlist on each room
+    server.emit(USER_LIST_UPDATES, usernameList);
+  })
+
+});
+
+function rateChecker(message, socket){
     socket.timeCheck.unshift(Date.now())
 
     if(socket.timeCheck.length > 4){
@@ -75,38 +108,6 @@ server.sockets.on(SOCKET_CONNECTION, function (socket){
   }
 
 
-  socket.on(SOCKET_USER_REGISTRATION, function(username, callback){
-    if( usernameList.hasOwnProperty(username) || username === '' ){
-      callback(false);
-    }else{
-
-      usernameList[username] = username;
-
-      socket.username = username;
-
-      server.emit(SOCKET_USER_MESSAGE, SERVER_USER, username + ' joined')
-
-      callback(true);
-      console.log('New User: ', socket.username);
-
-    server.emit(USER_LIST_UPDATES, usernameList);
-    }
-  });
-
-
-  socket.on(SOCKET_DISCONNECT, function(){
-    //removes the socket
-    delete(usernameList[socket.username]);
-    //sends a message to all users that they left
-    if( socket.username !== undefined){
-      socket.broadcast.emit(SOCKET_USER_MESSAGE, SERVER_USER, socket.username + ' has left the building.')
-    }
-    //updates the userlist on each room
-    server.emit(USER_LIST_UPDATES, usernameList);
-  })
-
-});
-
 function adminMessageOut(socket){
 
   process.stdin.setEncoding('utf8');
@@ -147,7 +148,7 @@ function kickOutUser(user, message, socket){
   if(socket.username === user){
 
     //emits a message to all other users who was kicked out and why
-    server.emit(SOCKET_USER_MESSAGE, SERVER_USER, user + ' was kicked out bec/ they ' + message);
+    server.emit(SOCKET_USER_MESSAGE, SERVER_USER, socket.username + ' was kicked out bec/ they ' + message);
 
     //need to change the users page
     socket.emit(KICKED_OUT_USER, user, message)
@@ -166,27 +167,4 @@ function kickOutUser(user, message, socket){
 
 
 
-
-
-
 }
-
-
-//WIll use to auto kick ppl out
-// function autoRemove(socket, data){
-
-//   socket.timeCheck.unshift(Date.now())
-
-//   console.log(socket.timeCheck);
-
-//   if(socket.timeCheck.length > 4){
-//     if(socket.timeCheck[0] - socket.timeCheck[4] < 5000){
-//       blackList.push(clientConnectedList[socket.remotePort].username);
-//       socket.end('removed');
-//     }else{
-//       writeMessages(socket, data);
-//     }
-//   }else{
-//     writeMessages(socket, data);
-//   }
-// }
