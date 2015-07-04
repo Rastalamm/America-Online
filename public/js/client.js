@@ -87,23 +87,17 @@ var clientUsername;
 
   function checkForMention (from, userMessage){
 
-    var myUN = '@' + clientUsername;
+    var findThisUn = '@' + clientUsername;
 
     var mentionSpan = $('<span>',{
       text : clientUsername,
       class : 'mention'
     });
 
-    replaced = userMessage.replace(myUN, mentionSpan.get(0).outerHTML );
+    userMessage = userMessage.replace(findThisUn, mentionSpan.get(0).outerHTML );
 
-    message(from, replaced)
-
+    message(from, userMessage)
   }
-
-  function addMentionSpan (){
-
-  }
-
 
   $('#registration_form').submit(function(){
 
