@@ -78,7 +78,7 @@
     var messageField = $('#message');
     var theMessage = messageField.val();
 
-    socket.emit(SOCKET_USER_MESSAGE, theMessage)
+    socket.emit(SOCKET_USER_MESSAGE, theMessage, clientUsername)
 
     messageField.val('');
 
