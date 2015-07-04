@@ -7,13 +7,18 @@ var SOCKET_USER_REGISTRATION = 'user registration';
 var USER_LIST_UPDATES = 'update username list';
 var USER_MENTIONED = 'mentions';
 var SERVER_USER = 'Mr. Server';
+var KICKED_OUT_USER = 'kicked out user';
 
 var server = socketIO.listen(PORT);
 var usernameList = {};
+var blackListUserNamess = [];
+var blackListIp = [];
 
 
 server.sockets.on(SOCKET_CONNECTION, function(socket){
   console.log('you have a connection');
+  //allows admin to run commands on users
+  adminMessageOut(socket)
 
   socket.on(SOCKET_USER_MESSAGE, function(message){
 
@@ -40,24 +45,77 @@ server.sockets.on(SOCKET_CONNECTION, function(socket){
     }
   });
 
-  socket.on(USER_MENTIONED, function (){
-    console.log('a mention');
-  });
-
-
-
 
   socket.on(SOCKET_DISCONNECT, function(){
+    //removes the socket
     delete(usernameList[socket.username]);
-
+    //sends a message to all users that they left
     if( socket.username !== undefined){
       socket.broadcast.emit(SOCKET_USER_MESSAGE, SERVER_USER, socket.username + ' has left the building.')
     }
-
-
-
-    console.log('updated list', usernameList);
+    //updates the userlist on each room
     server.emit(USER_LIST_UPDATES, usernameList);
   })
 
 });
+
+function adminMessageOut(socket){
+
+  process.stdin.setEncoding('utf8');
+
+  process.stdin.on('data', function(data){
+
+    data = data.split(' ')
+
+    command = data.splice(0,1).toString();
+    user = data.splice(0,1).toString();
+    message = data.join(' ');
+
+    commands(command, user, message, socket);
+
+  })
+}
+
+function commands(command, user, message, socket){
+
+  switch(command){
+    case '~kick':
+      kickOutUser(user, message, socket);
+    break;
+//not working
+    case '~userlist':
+      console.log('Current Users', usernameList);
+    break;
+
+    default:
+      //some code
+    break;
+
+  }
+}
+
+function kickOutUser(user, message, socket){
+
+  if(socket.username === user){
+
+    //emits a message to all other users who was kicked out and why
+    server.emit(SOCKET_USER_MESSAGE, SERVER_USER, user + ' was kicked out bec/ they ' + message);
+
+    //need to change the users page
+    socket.emit(KICKED_OUT_USER, user, message)
+
+    //writes a message to the server
+    process.stdout.write('IP: ' + socket.handshake.address + ' has been kicked out \n');
+
+    //Add the IP to blacklist IP's
+    blackListIp.push(socket.handshake.address)
+    //blackListUserNamess.push(user);
+
+
+    //removes user from all other lists
+    socket.broadcast.emit(USER_LIST_UPDATES, usernameList);
+    socket.disconnect();
+  }
+}
+
+
