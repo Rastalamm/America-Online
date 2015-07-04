@@ -54,15 +54,8 @@
   })
 
   socket.on(KICKED_OUT_USER, function (user, message){
-
-    console.log('user', user);
-    console.log('message', message);
-
     kickedOutPage(user, message);
-
   })
-
-
 
 
   function message(from, message){
@@ -73,7 +66,6 @@
       var messageTag = $('<span>', {
         html : message
       });
-
 
       newMessage.append(fromTag);
       newMessage.append(messageTag);
@@ -126,8 +118,6 @@
 
     return false;
   });
-
-
 
 
   var registration = $('#registration');

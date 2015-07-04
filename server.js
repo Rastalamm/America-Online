@@ -17,6 +17,7 @@ var blackListIp = [];
 
 server.sockets.on(SOCKET_CONNECTION, function(socket){
   console.log('you have a connection');
+  //allows admin to run commands on users
   adminMessageOut(socket)
 
   socket.on(SOCKET_USER_MESSAGE, function(message){
@@ -44,23 +45,15 @@ server.sockets.on(SOCKET_CONNECTION, function(socket){
     }
   });
 
-  socket.on(USER_MENTIONED, function (){
-    console.log('a mention');
-  });
-
-
-
 
   socket.on(SOCKET_DISCONNECT, function(){
+    //removes the socket
     delete(usernameList[socket.username]);
-
+    //sends a message to all users that they left
     if( socket.username !== undefined){
       socket.broadcast.emit(SOCKET_USER_MESSAGE, SERVER_USER, socket.username + ' has left the building.')
     }
-
-
-
-    console.log('updated list', usernameList);
+    //updates the userlist on each room
     server.emit(USER_LIST_UPDATES, usernameList);
   })
 
@@ -89,7 +82,7 @@ function commands(command, user, message, socket){
     case '~kick':
       kickOutUser(user, message, socket);
     break;
-
+//not working
     case '~userlist':
       console.log('Current Users', usernameList);
     break;
@@ -103,36 +96,26 @@ function commands(command, user, message, socket){
 
 function kickOutUser(user, message, socket){
 
-  console.log('the socket', socket.username);
+  if(socket.username === user){
 
-    if(socket.username === user){
+    //emits a message to all other users who was kicked out and why
+    server.emit(SOCKET_USER_MESSAGE, SERVER_USER, user + ' was kicked out bec/ they ' + message);
 
+    //need to change the users page
+    socket.emit(KICKED_OUT_USER, user, message)
 
-      //emits a message to all other users who was kicked out and why
-      server.emit(SOCKET_USER_MESSAGE, SERVER_USER, user + ' was kicked out bec/ they ' + message);
+    //writes a message to the server
+    process.stdout.write('IP: ' + socket.handshake.address + ' has been kicked out \n');
 
-      //need to change the users page
-      socket.emit(KICKED_OUT_USER, user, message)
-
-      //removes user from all other lists
-      socket.broadcast.emit(USER_LIST_UPDATES, usernameList);
-      socket.disconnect();
-
-
-      //get soockets IP
+    //Add the IP to blacklist IP's
+    blackListIp.push(socket.handshake.address)
+    //blackListUserNamess.push(user);
 
 
-      //blacklist IP's
-
-
-      //blacklist usernames
-
-
-
-      //blackListIp.push
-      //blackListUserNamess.push(clientConnectedList[key].username);
-      //console.log('Output', socket.username);
-    }
+    //removes user from all other lists
+    socket.broadcast.emit(USER_LIST_UPDATES, usernameList);
+    socket.disconnect();
+  }
 }
 
 
