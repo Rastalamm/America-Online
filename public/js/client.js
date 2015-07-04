@@ -10,10 +10,12 @@
   var SOCKET_USER_REGISTRATION = 'user registration';
   var USER_LIST_UPDATES = 'update username list';
   var USER_MENTIONED = 'mentions';
+  var KICKED_OUT_USER = 'kicked out user';
 
 
   var SYSTEM = 'System';
   var socket = io.connect(SERVER_ADDRESS);
+  var clientUsername;
 
 
   // socket.on(SOCKET_CONNECT, function(){
@@ -45,13 +47,20 @@
     checkForMention(from, userMessage);
   })
 
-var clientUsername;
 
   socket.on(USER_LIST_UPDATES, function (usernameList, username){
 
     updateUserLst(usernameList);
   })
 
+  socket.on(KICKED_OUT_USER, function (user, message){
+
+    console.log('user', user);
+    console.log('message', message);
+
+    kickedOutPage(user, message);
+
+  })
 
 
 
@@ -150,7 +159,11 @@ var clientUsername;
     }
   }
 
-
+  function kickedOutPage (){
+    chatRoom.hide();
+    usersOnline.hide();
+    registration.show();
+  }
 
 
 })();
