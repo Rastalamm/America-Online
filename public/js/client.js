@@ -54,7 +54,7 @@
   })
 
   socket.on(KICKED_OUT_USER, function (user, message){
-    kickedOutPage(user, message);
+    kickedOutPage();
   })
 
 
@@ -105,14 +105,14 @@
     var username = $('#username').val();
 
 
-    socket.emit(SOCKET_USER_REGISTRATION, username, function (available){
+    socket.emit(SOCKET_USER_REGISTRATION, username, function (available, message){
 
       if (available){
         clientUsername = username
         changeStateOfChatRoom();
       }
       else{
-        $('#username_error').text('Username has been taken!');
+        $('#username_error').text(message);
       }
     });
 
