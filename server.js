@@ -154,8 +154,12 @@ function commands(command, user, message, socket){
     break;
 
 //not working
+    case '~unban':
+      unBanUser(user, socket);
+    break;
+
     case '~userlist':
-      console.log('Current Users', usernameList);
+      console.log(Object.keys(usernameList));
     break;
 
     default:
@@ -166,14 +170,24 @@ function commands(command, user, message, socket){
 
 }
 
+
+function unBanUser (user, socket){
+  //removes the username from the ban list
+  if(blackListUserNamess.indexOf(user) > -1){
+    blackListUserNamess.splice(blackListUserNamess.indexOf(user),1);
+  }
+
+//removes the IP address from the ban list
+  if(blackListIp.indexOf(user) > -1){
+    blackListIp.splice(blackListIp.indexOf(user),1);
+  }
+}
+
 function banUser (user, socket){
 
   if(user === socket.username){
     blackListIp.push(socket.handshake.address)
     blackListUserNamess.push(user);
-
-    console.log('bL UN', blackListUserNamess);
-    console.log('BL INP', blackListIp);
 
  //emits a message to all other users who was kicked out and why
     server.emit(SOCKET_USER_MESSAGE, SERVER_USER, socket.username + ' was banned');
