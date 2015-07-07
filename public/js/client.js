@@ -11,6 +11,7 @@
   var USER_LIST_UPDATES = 'update username list';
   var USER_MENTIONED = 'mentions';
   var KICKED_OUT_USER = 'kicked out user';
+  var PRIVATE_MESSAGE = 'private message';
 
 
   var SYSTEM = 'System';
@@ -43,20 +44,22 @@
   })
 
   socket.on(SOCKET_USER_MESSAGE, function (from, userMessage){
-
     checkForMention(from, userMessage);
   })
 
-
   socket.on(USER_LIST_UPDATES, function (usernameList, username){
-
     updateUserLst(usernameList);
   })
 
-  socket.on(KICKED_OUT_USER, function (user, message){
+  socket.on(KICKED_OUT_USER, function (user, userMessage){
     kickedOutPage();
   })
 
+  socket.on(PRIVATE_MESSAGE, function (user, userMessage, to){
+    if(to === clientUsername){
+      message(to, userMessage);
+    }
+  })
 
   function message(from, message){
       var newMessage = $('<p>');
@@ -72,7 +75,6 @@
     $('#chatlog').append(newMessage).get(0).scrollTop = 1000000000;
   }
 
-
   $('#messageform').submit(function(){
 
     var messageField = $('#message');
@@ -86,24 +88,9 @@
   });
 
 
-  function checkForMention (from, userMessage){
-
-    var findThisUn = '@' + clientUsername + ' ';
-
-    var mentionSpan = $('<span>',{
-      text : clientUsername + ' ',
-      class : 'mention'
-    });
-
-    userMessage = userMessage.replace(findThisUn, mentionSpan.get(0).outerHTML );
-
-    message(from, userMessage)
-  }
-
   $('#registration_form').submit(function(){
 
     var username = $('#username').val();
-
 
     socket.emit(SOCKET_USER_REGISTRATION, username, function (available, message){
 
@@ -154,6 +141,30 @@
     usersOnline.hide();
     registration.show();
   }
+
+  function checkForMention (from, userMessage){
+
+    var findThisUn = '@' + clientUsername + ' ';
+
+    var mentionSpan = $('<span>',{
+      text : clientUsername + ' ',
+      class : 'mention'
+    });
+
+    userMessage = userMessage.replace(findThisUn, mentionSpan.get(0).outerHTML );
+
+    message(from, userMessage)
+  }
+
+
+
+
+
+
+
+
+
+
 
 
 })();
