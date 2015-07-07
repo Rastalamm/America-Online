@@ -9,6 +9,7 @@ var USER_MENTIONED = 'mentions';
 var SERVER_USER = 'Mr. Server';
 var KICKED_OUT_USER = 'kicked out user';
 var PRIVATE_MESSAGE = 'private message';
+var BLOCKED_USER = 'blocked user';
 
 var server = socketIO.listen(PORT);
 var usernameList = {};
@@ -132,12 +133,16 @@ function clientCommandCenter (message, socket){
 
       switch(command){
 
+        case '~help':
+          displayClientCommands(socket);
+        break;
+
         case '~pm':
           privateMessage(to, message, socket)
         break;
 
-        case '~help':
-          displayClientCommands(socket);
+        case '~block':
+          blockClient(to, message, socket)
         break;
 
         default:
@@ -151,6 +156,27 @@ function clientCommandCenter (message, socket){
       //if it just a regular message send out as normal
       server.emit(SOCKET_USER_MESSAGE, socket.username, message)
     }
+
+}
+
+function blockClient (to, message, socket){
+
+  //check current user list for username
+
+  if(usernameList.hasOwnProperty(to)){
+
+    //to is the UN blockecd
+    //socket.emit(SOCKET_USER_MESSAGE, socket.username, (to + " has been blocked bec/" + message));
+    server.emit(SOCKET_USER_MESSAGE, SERVER_USER, (to + " has been blocked by "+ socket.username + " bec/ " + message));
+
+  }else{
+
+    socket.emit(SOCKET_USER_MESSAGE, socket.username, 'Cannot find username');
+  }
+  //report back to socket if the user was blocked
+  //report to all users whcih user was blocked and the reason
+
+  //disallow receiving of private messages from a blocked user
 
 }
 

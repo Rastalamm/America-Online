@@ -12,6 +12,7 @@
   var USER_MENTIONED = 'mentions';
   var KICKED_OUT_USER = 'kicked out user';
   var PRIVATE_MESSAGE = 'private message';
+  var BLOCKED_USER = 'blocked user';
 
 
   var SYSTEM = 'System';
@@ -60,6 +61,19 @@
       message(to, userMessage);
     }
   })
+
+  socket.on(BLOCKED_USER, function (user, blockedUN, userMessage){
+
+    addToBlockList(user, blockedUN, userMessage);
+
+  })
+
+var myBlockedList = [];
+
+  function addToBlockList(user, blockedUN, userMessage){
+    myBlockedList.push(user);
+    message('Server', userMessage)
+  }
 
   function message(from, message){
       var newMessage = $('<p>');
