@@ -160,29 +160,17 @@ function clientCommandCenter (message, socket){
 }
 
 function blockClient (to, message, socket){
-
-  //check current user list for username
-
   if(usernameList.hasOwnProperty(to)){
-
-    //to is the UN blockecd
-    //socket.emit(SOCKET_USER_MESSAGE, socket.username, (to + " has been blocked bec/" + message));
+    socket.emit(BLOCKED_USER, socket.username, to)
     server.emit(SOCKET_USER_MESSAGE, SERVER_USER, (to + " has been blocked by "+ socket.username + " bec/ " + message));
-
   }else{
-
     socket.emit(SOCKET_USER_MESSAGE, socket.username, 'Cannot find username');
   }
-  //report back to socket if the user was blocked
-  //report to all users whcih user was blocked and the reason
-
-  //disallow receiving of private messages from a blocked user
-
 }
 
 function privateMessage(to, message, socket){
 
-    socket.emit(SOCKET_USER_MESSAGE, socket.username, (to +message));
+    socket.emit(SOCKET_USER_MESSAGE, socket.username, (to + ': '+ message));
     message = '<span class ="pm_label">' + 'Private Message: ' + message + '</span>';
     server.emit(PRIVATE_MESSAGE, socket.username, message, to);
 }

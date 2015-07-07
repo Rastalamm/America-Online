@@ -55,24 +55,26 @@
   socket.on(KICKED_OUT_USER, function (user, userMessage){
     kickedOutPage();
   })
+var myBlockedList = [];
 
   socket.on(PRIVATE_MESSAGE, function (user, userMessage, to){
-    if(to === clientUsername){
+    console.log('PM', myBlockedList.indexOf(user));
+    if(to === clientUsername && myBlockedList.indexOf(user) === -1 ){
       message(to, userMessage);
     }
   })
 
-  socket.on(BLOCKED_USER, function (user, blockedUN, userMessage){
+  socket.on(BLOCKED_USER, function (user, blockedUN){
 
-    addToBlockList(user, blockedUN, userMessage);
+    addToBlockList(user, blockedUN);
 
   })
 
-var myBlockedList = [];
 
-  function addToBlockList(user, blockedUN, userMessage){
-    myBlockedList.push(user);
-    message('Server', userMessage)
+  function addToBlockList(user, blockedUN){
+    myBlockedList.push(blockedUN);
+
+    console.log('bb list', myBlockedList);
   }
 
   function message(from, message){
