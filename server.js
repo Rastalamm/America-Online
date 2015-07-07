@@ -8,6 +8,7 @@ var USER_LIST_UPDATES = 'update username list';
 var USER_MENTIONED = 'mentions';
 var SERVER_USER = 'Mr. Server';
 var KICKED_OUT_USER = 'kicked out user';
+var PRIVATE_MESSAGE = 'private message';
 
 var server = socketIO.listen(PORT);
 var usernameList = {};
