@@ -38,7 +38,7 @@ server.sockets.on(SOCKET_CONNECTION, function (socket){
   socket.on(SOCKET_USER_REGISTRATION, function(username, callback){
 
     //uncomment for IP check on registration
-    if(blackListUserNamess.indexOf(username) > -1 /*|| blackListIp.indexOf(socket.handshake.address) > -1*/){
+    if(blackListUserNamess.indexOf(username) > -1 /*|| blackListIp.indexOf(socket.address) > -1*/){
       callback(false, 'You\'ve been banned son');
     }else{
 
