@@ -14,6 +14,7 @@ var server = socketIO.listen(PORT);
 var usernameList = {};
 var blackListUserNamess = [];
 var blackListIp = [];
+var clientCommandList = ['help', 'pm'];
 
 
 server.sockets.on(SOCKET_CONNECTION, function (socket){
@@ -107,40 +108,73 @@ function rateChecker(message, socket){
 
     }else{
       //checks the message for private
-      privateMessage(message, socket)
+      clientCommandCenter(message, socket)
     }
   }else{
     //checks the message for private
-    privateMessage(message, socket)
+    clientCommandCenter(message, socket)
   }
 }
 
-  function privateMessage(message, socket){
-
-    var looking = ('~pm');
-    var lookLength = looking.length;
-    var start = message.indexOf(looking);
+function clientCommandCenter (message, socket){
     var tempArr;
     var to;
     var command;
     var originMess;
 
-    //validates whether a user entered a ~pm
-    if(message.charAt(0) === '~' && message.charAt(1) === 'p' && message.charAt(2) === 'm'){
+    if(message.charAt(0) === '~'){
 
       tempArr = message.split(' ');
       originMess = tempArr.join(' ');
       command = tempArr.splice(0,1).join('');
       to = tempArr.splice(0,1).join('');
-      message = '<span class ="pm_label">' + 'Private Message: ' + tempArr.join(' ') + '</span>';
+      message = tempArr.join(' ');
 
-      server.emit(PRIVATE_MESSAGE, socket.username, message, to);
-      socket.emit(SOCKET_USER_MESSAGE, socket.username, originMess);
+      switch(command){
+
+        case '~pm':
+          privateMessage(to, message, socket)
+        break;
+
+        case '~help':
+          displayClientCommands(socket);
+        break;
+
+        default:
+          socket.emit(SOCKET_USER_MESSAGE, socket.username, 'Command not recognized');
+        break;
+
+      }
 
     }else{
+
+      //if it just a regular message send out as normal
       server.emit(SOCKET_USER_MESSAGE, socket.username, message)
     }
+
+}
+
+function privateMessage(to, message, socket){
+
+    socket.emit(SOCKET_USER_MESSAGE, socket.username, (to +message));
+    message = '<span class ="pm_label">' + 'Private Message: ' + message + '</span>';
+    server.emit(PRIVATE_MESSAGE, socket.username, message, to);
+}
+
+function displayClientCommands(socket){
+  var sentence = 'Type in ~ ';
+
+  for(var i = 0; i < clientCommandList.length; i++){
+
+    sentence += clientCommandList[i];
+    sentence += ' ';
   }
+
+  sentence += " to run your command.";
+
+  socket.emit(SOCKET_USER_MESSAGE, socket.username, sentence);
+
+}
 
 
 function adminMessageOut(socket){
