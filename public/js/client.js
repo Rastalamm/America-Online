@@ -61,7 +61,6 @@
     }
   })
 
-
   function message(from, message){
       var newMessage = $('<p>');
       var fromTag = $('<b>', {
@@ -76,7 +75,6 @@
     $('#chatlog').append(newMessage).get(0).scrollTop = 1000000000;
   }
 
-
   $('#messageform').submit(function(){
 
     var messageField = $('#message');
@@ -90,11 +88,9 @@
   });
 
 
-
   $('#registration_form').submit(function(){
 
     var username = $('#username').val();
-
 
     socket.emit(SOCKET_USER_REGISTRATION, username, function (available, message){
 
