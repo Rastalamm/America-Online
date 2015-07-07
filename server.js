@@ -10,6 +10,7 @@ var SERVER_USER = 'Mr. Server';
 var KICKED_OUT_USER = 'kicked out user';
 var PRIVATE_MESSAGE = 'private message';
 var BLOCKED_USER = 'blocked user';
+var UNBLOCKED_USER = 'unblocked user';
 
 var server = socketIO.listen(PORT);
 var usernameList = {};
@@ -145,6 +146,10 @@ function clientCommandCenter (message, socket){
           blockClient(to, message, socket)
         break;
 
+        case '~unblock':
+          unblockClient(to, message, socket)
+        break;
+
         default:
           socket.emit(SOCKET_USER_MESSAGE, socket.username, 'Command not recognized');
         break;
@@ -152,10 +157,20 @@ function clientCommandCenter (message, socket){
       }
 
     }else{
-
       //if it just a regular message send out as normal
       server.emit(SOCKET_USER_MESSAGE, socket.username, message)
     }
+
+}
+
+function unblockClient (to, message, socket){
+  if(usernameList.hasOwnProperty(to)){
+    socket.emit(UNBLOCKED_USER, socket.username, to)
+    server.emit(SOCKET_USER_MESSAGE, SERVER_USER, (to + " has been unblocked by "+ socket.username + " bec/ " + message));
+  }else{
+    socket.emit(SOCKET_USER_MESSAGE, socket.username, 'Cannot find username');
+  }
+
 
 }
 
