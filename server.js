@@ -35,21 +35,29 @@ server.sockets.on(SOCKET_CONNECTION, function (socket){
 
 
   socket.on(SOCKET_USER_REGISTRATION, function(username, callback){
-    if( usernameList.hasOwnProperty(username) || username === '' ){
-      callback(false);
+
+    //uncomment for IP check on registration
+    if(blackListUserNamess.indexOf(username) > -1 /*|| blackListIp.indexOf(socket.handshake.address) > -1*/){
+      callback(false, 'You\'ve been banned son');
     }else{
 
-      usernameList[username] = username;
+      if( usernameList.hasOwnProperty(username) || username === '' ){
+        callback(false, 'Username has been taken!');
+      }else{
 
-      socket.username = username;
+        usernameList[username] = username;
 
-      server.emit(SOCKET_USER_MESSAGE, SERVER_USER, username + ' joined')
+        socket.username = username;
 
-      callback(true);
-      console.log('New User: ', socket.username);
+        server.emit(SOCKET_USER_MESSAGE, SERVER_USER, username + ' joined')
 
-    server.emit(USER_LIST_UPDATES, usernameList);
+        callback(true);
+        console.log('New User: ', socket.username);
+
+      server.emit(USER_LIST_UPDATES, usernameList);
+      }
     }
+
   });
 
 
@@ -85,7 +93,6 @@ function rateChecker(message, socket){
         break;
 
         case 3:
-        socket.emit(SOCKET_USER_MESSAGE, SERVER_USER, 'strikeout!')
         kickOutUser(socket.username, 'sent too many messages too quickly.', socket);
         break;
 
@@ -113,14 +120,25 @@ function adminMessageOut(socket){
 
   process.stdin.on('data', function(data){
 
-    data = data.split(' ')
+    data = data.substring(0, data.length-1);
 
-    command = data.splice(0,1).toString();
-    user = data.splice(0,1).toString();
-    message = data.join(' ');
+    if(data.split(' ').length > 2){
 
-    commands(command, user, message, socket);
+      data = data.split(' ')
 
+      command = data.splice(0,1).toString();
+      user = data.splice(0,1).toString();
+      message = data.join(' ');
+
+      commands(command, user, message, socket);
+    }else{
+      data = data.split(' ')
+
+      command = data.splice(0,1).toString();
+      user = data.splice(0,1).toString();
+
+      commands(command, user, 'null', socket)
+    }
   })
 }
 
@@ -130,9 +148,18 @@ function commands(command, user, message, socket){
     case '~kick':
       kickOutUser(user, message, socket);
     break;
+
+    case '~ban' :
+      banUser(user, socket);
+    break;
+
 //not working
+    case '~unban':
+      unBanUser(user, socket);
+    break;
+
     case '~userlist':
-      console.log('Current Users', usernameList);
+      console.log(Object.keys(usernameList));
     break;
 
     default:
@@ -140,30 +167,61 @@ function commands(command, user, message, socket){
     break;
 
   }
+
 }
+
+
+function unBanUser (user, socket){
+  //removes the username from the ban list
+  if(blackListUserNamess.indexOf(user) > -1){
+    blackListUserNamess.splice(blackListUserNamess.indexOf(user),1);
+  }
+
+//removes the IP address from the ban list
+  if(blackListIp.indexOf(user) > -1){
+    blackListIp.splice(blackListIp.indexOf(user),1);
+  }
+}
+
+function banUser (user, socket){
+
+  if(user === socket.username){
+    blackListIp.push(socket.handshake.address)
+    blackListUserNamess.push(user);
+
+ //emits a message to all other users who was kicked out and why
+    server.emit(SOCKET_USER_MESSAGE, SERVER_USER, socket.username + ' was banned');
+//writes a message to the server
+    process.stdout.write('User: ' + socket.username +' with the IP: ' + socket.handshake.address + ' has been banned \n');
+
+    finalGoodbye(user, socket)
+  }
+
+}
+
 
 function kickOutUser(user, message, socket){
 
-  if(socket.username === user){
-
+  if(user === socket.username){
     //emits a message to all other users who was kicked out and why
     server.emit(SOCKET_USER_MESSAGE, SERVER_USER, socket.username + ' was kicked out bec/ they ' + message);
-
-    //need to change the users page
-    socket.emit(KICKED_OUT_USER, user, message)
 
     //writes a message to the server
     process.stdout.write('IP: ' + socket.handshake.address + ' has been kicked out \n');
 
-    //Add the IP and username to blacklist
-    blackListIp.push(socket.handshake.address)
-    blackListUserNamess.push(user);
+    finalGoodbye (user, socket, message);
 
+  }
+}
+
+
+function finalGoodbye (user, socket) {
     //removes user from all other lists
+    //need to change the users page
+  if(user === socket.username){
+    socket.emit(KICKED_OUT_USER)
+
     socket.broadcast.emit(USER_LIST_UPDATES, usernameList);
     socket.disconnect();
   }
-
-
-
 }
