@@ -76,6 +76,7 @@ server.sockets.on(SOCKET_CONNECTION, function (socket){
 });
 
 function rateChecker(message, socket){
+
   socket.timeCheck.unshift(Date.now())
 
   if(socket.timeCheck.length > 4){
@@ -103,16 +104,51 @@ function rateChecker(message, socket){
 
       //Messages to the socket
       socket.emit(SOCKET_USER_MESSAGE, socket.username, message);
+      //privateMessage(message, socket, to)
 
     }else{
       //sends the messages back to everyone
-    server.emit(SOCKET_USER_MESSAGE, socket.username, message)
+      privateMessage(message, socket)
+   // server.emit(SOCKET_USER_MESSAGE, socket.username, message)
     }
   }else{
     //sends the messages back to everyone
-    server.emit(SOCKET_USER_MESSAGE, socket.username, message)
+    privateMessage(message, socket)
+   // server.emit(SOCKET_USER_MESSAGE, socket.username, message)
   }
 }
+
+  function privateMessage(message, socket){
+
+    var looking = ('~pm');
+    var lookLength = looking.length;
+    var start = message.indexOf(looking);
+    var tempArr;
+    var to;
+    var command;
+    var originMess;
+
+
+    //validates whether a user entered a ~pm
+    if(message.charAt(0) === '~' && message.charAt(1) === 'p' && message.charAt(2) === 'm'){
+
+      tempArr = message.split(' ');
+      originMess = tempArr.join(' ');
+      command = tempArr.splice(0,1).join('');
+      to = tempArr.splice(0,1).join('');
+      message = tempArr.join(' ');
+      //rateChecker(message, socket, to)
+      server.emit(PRIVATE_MESSAGE, socket.username, message, to);
+      socket.emit(SOCKET_USER_MESSAGE, socket.username, originMess);
+
+    }else{
+      //rateChecker(message, socket, to)
+      server.emit(SOCKET_USER_MESSAGE, socket.username, message)
+      //socket.emit(SOCKET_USER_MESSAGE, socket.username, message);
+    }
+
+  }
+
 
 
 function adminMessageOut(socket){

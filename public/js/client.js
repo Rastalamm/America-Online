@@ -43,25 +43,22 @@
     }
   })
 
-  // socket.on(SOCKET_USER_MESSAGE, function (from, userMessage){
-
-  //   checkForMention(from, userMessage);
-  // })
+  socket.on(SOCKET_USER_MESSAGE, function (from, userMessage){
+    checkForMention(from, userMessage);
+  })
 
   socket.on(USER_LIST_UPDATES, function (usernameList, username){
-
     updateUserLst(usernameList);
   })
 
-  socket.on(KICKED_OUT_USER, function (user, message){
+  socket.on(KICKED_OUT_USER, function (user, userMessage){
     kickedOutPage();
   })
 
-  socket.on(SOCKET_USER_MESSAGE, function (user, message){
-
-
-
-    checkForMention(from, userMessage);
+  socket.on(PRIVATE_MESSAGE, function (user, userMessage, to){
+    if(to === clientUsername){
+      message(to, userMessage);
+    }
   })
 
 
@@ -165,25 +162,6 @@
 
 
 
-  function privateMessage(){
-
-
-    var findThisUn = '~' + pm;
-
-    if(userMessage.){
-
-    }else{
-
-    }
-
-
-    userMessage = userMessage.replace(findThisUn, mentionSpan.get(0).outerHTML );
-
-    socket.emit(SOCKET_USER_MESSAGE, theMessage, clientUsername)
-
-    //checkForMention(from, userMessage)
-
-  }
 
 
 
