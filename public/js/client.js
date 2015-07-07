@@ -11,6 +11,7 @@
   var USER_LIST_UPDATES = 'update username list';
   var USER_MENTIONED = 'mentions';
   var KICKED_OUT_USER = 'kicked out user';
+  var PRIVATE_MESSAGE = 'private message';
 
 
   var SYSTEM = 'System';
@@ -42,11 +43,10 @@
     }
   })
 
-  socket.on(SOCKET_USER_MESSAGE, function (from, userMessage){
+  // socket.on(SOCKET_USER_MESSAGE, function (from, userMessage){
 
-    checkForMention(from, userMessage);
-  })
-
+  //   checkForMention(from, userMessage);
+  // })
 
   socket.on(USER_LIST_UPDATES, function (usernameList, username){
 
@@ -55,6 +55,13 @@
 
   socket.on(KICKED_OUT_USER, function (user, message){
     kickedOutPage();
+  })
+
+  socket.on(SOCKET_USER_MESSAGE, function (user, message){
+
+
+
+    checkForMention(from, userMessage);
   })
 
 
@@ -86,19 +93,6 @@
   });
 
 
-  function checkForMention (from, userMessage){
-
-    var findThisUn = '@' + clientUsername + ' ';
-
-    var mentionSpan = $('<span>',{
-      text : clientUsername + ' ',
-      class : 'mention'
-    });
-
-    userMessage = userMessage.replace(findThisUn, mentionSpan.get(0).outerHTML );
-
-    message(from, userMessage)
-  }
 
   $('#registration_form').submit(function(){
 
@@ -154,6 +148,49 @@
     usersOnline.hide();
     registration.show();
   }
+
+  function checkForMention (from, userMessage){
+
+    var findThisUn = '@' + clientUsername + ' ';
+
+    var mentionSpan = $('<span>',{
+      text : clientUsername + ' ',
+      class : 'mention'
+    });
+
+    userMessage = userMessage.replace(findThisUn, mentionSpan.get(0).outerHTML );
+
+    message(from, userMessage)
+  }
+
+
+
+  function privateMessage(){
+
+
+    var findThisUn = '~' + pm;
+
+    if(userMessage.){
+
+    }else{
+
+    }
+
+
+    userMessage = userMessage.replace(findThisUn, mentionSpan.get(0).outerHTML );
+
+    socket.emit(SOCKET_USER_MESSAGE, theMessage, clientUsername)
+
+    //checkForMention(from, userMessage)
+
+  }
+
+
+
+
+
+
+
 
 
 })();

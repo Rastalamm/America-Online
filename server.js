@@ -154,7 +154,6 @@ function commands(command, user, message, socket){
       banUser(user, socket);
     break;
 
-//not working
     case '~unban':
       unBanUser(user, socket);
     break;
