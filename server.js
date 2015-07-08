@@ -121,58 +121,57 @@ function rateChecker(message, socket){
 }
 
 function clientCommandCenter (message, socket){
-    var tempArr;
-    var to;
-    var command;
-    var originMess;
+  var tempArr;
+  var to;
+  var command;
+  var originMess;
 
-    if(message.charAt(0) === '~'){
+  if(message.charAt(0) === '~'){
 
-      tempArr = message.split(' ');
-      originMess = tempArr.join(' ');
-      command = tempArr.splice(0,1).join('');
-      to = tempArr.splice(0,1).join('');
-      message = tempArr.join(' ');
+    tempArr = message.split(' ');
+    originMess = tempArr.join(' ');
+    command = tempArr.splice(0,1).join('');
+    to = tempArr.splice(0,1).join('');
+    message = tempArr.join(' ');
 
-      switch(command){
+    switch(command){
 
-        case '~help':
-          displayClientCommands(socket);
-        break;
+      case '~help':
+        displayClientCommands(socket);
+      break;
 
-        case '~pm':
-          privateMessage(to, message, socket)
-        break;
+      case '~pm':
+        privateMessage(to, message, socket)
+      break;
 
-        case '~block':
-          blockClient(to, message, socket)
-        break;
+      case '~block':
+        blockClient(to, message, socket)
+      break;
 
-        case '~unblock':
-          unblockClient(to, message, socket)
-        break;
+      case '~unblock':
+        unblockClient(to, message, socket)
+      break;
 
-        case '~ignore':
-          ignoreClient(to, message, socket)
-        break;
+      case '~ignore':
+        ignoreClient(to, message, socket)
+      break;
 
-        case '~unignore':
-          ignoreClient(to, message, socket)
-        break;
+      case '~unignore':
+        ignoreClient(to, message, socket)
+      break;
 
-        default:
-          socket.emit(SOCKET_USER_MESSAGE, socket.username, 'Command not recognized');
-        break;
+      default:
+        socket.emit(SOCKET_USER_MESSAGE, socket.username, 'Command not recognized');
+      break;
 
-      }
-
-    }else{
-
-      //if it just a regular message send out as normal
-      filterIgnored(message, socket);
-      //server.emit(SOCKET_USER_MESSAGE, socket.username, message)
     }
 
+  }else{
+
+    //if it just a regular message send out as normal
+    filterIgnored(message, socket);
+
+  }
 }
 
 function ignoreClient (to, message, socket){

@@ -55,7 +55,6 @@
 
 
   socket.on(PRIVATE_MESSAGE, function (user, userMessage, to){
-    console.log('PM', myBlockedList.indexOf(user));
     if(to === clientUsername){
       message(to, userMessage);
     }
