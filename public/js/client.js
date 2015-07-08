@@ -100,6 +100,7 @@
         changeStateOfChatRoom();
       }
       else{
+        $('#username').val('');
         $('#username_error').text(message);
       }
     });

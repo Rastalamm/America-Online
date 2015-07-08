@@ -1,3 +1,45 @@
+body {
+  width: 100%;
+  background-color: azure;
+}
+
+p {
+    font-family: 'Droid Sans', Helvetica, Arial, sans-serif;
+    font-size: 18px;
+    line-height: 25px;
+}
+
+#registration{
+  width: 500px;
+  height: 500px;
+  margin: auto;
+  background-color: azure;
+  text-align: center;
+}
+
+#registration > h2{
+  font-size: 30px;
+  padding-top: 12%;
+  font-family: 'Droid Serif', Georgia, Times, serif;
+}
+
+#username{
+  width: 200px;
+  height: 25px;
+  font-size: 20px;
+  text-align: center;
+  display: block;
+  margin: auto;
+  text-overflow: ellipsis;
+}
+
+
+
+.error{
+  color: brown;
+  font-size: 15px;
+}
+
 #chatlog p b {
   margin-right: 5px;
 }
@@ -11,7 +53,7 @@
 
 
 
-
+/* used for flashing
 .error {
     -webkit-animation-name: blinker;
     -webkit-animation-duration: 1s;
@@ -45,7 +87,7 @@
     0% { opacity: 1.0; }
     50% { opacity: 0.0; }
     100% { opacity: 1.0; }
-}
+}*/
 
 #usersonline{
   border: 1px solid black;

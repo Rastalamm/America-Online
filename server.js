@@ -48,26 +48,30 @@ server.sockets.on(SOCKET_CONNECTION, function (socket){
           callback(false, 'Usernames are spaceless');
         }else{
 
-          userList[username] = socket;
-          //gives the socket an empty blocklist/ignorelist for later
-          userList[username]['blockList'] = [];
-          userList[username]['ignoreList'] = [];
+          if(username.length > 16){
+            callback(false, 'Username must be less than 16 characters');
+          }else{
 
-          usernameList[username] = username;
+            userList[username] = socket;
+            //gives the socket an empty blocklist/ignorelist for later
+            userList[username]['blockList'] = [];
+            userList[username]['ignoreList'] = [];
 
-          socket.username = username;
+            usernameList[username] = username;
 
-          server.emit(SOCKET_USER_MESSAGE, SERVER_USER, username + ' joined')
+            socket.username = username;
 
-          callback(true);
+            server.emit(SOCKET_USER_MESSAGE, SERVER_USER, username + ' joined')
 
-          console.log('New User: ',userList[socket.username].username)
+            callback(true);
 
-          server.emit(USER_LIST_UPDATES, usernameList);
+            console.log('New User: ',userList[socket.username].username)
+
+            server.emit(USER_LIST_UPDATES, usernameList);
+          }
         }
       }
     }
-
   });
 
 
