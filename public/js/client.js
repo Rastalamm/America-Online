@@ -62,6 +62,7 @@
         html : message
       });
 
+
       newMessage.append(fromTag);
       newMessage.append(messageTag);
     $('#chatlog').append(newMessage).get(0).scrollTop = 1000000000;
