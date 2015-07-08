@@ -14,6 +14,7 @@ var UNBLOCKED_USER = 'unblocked user';
 
 var server = socketIO.listen(PORT);
 var usernameList = {};
+var userList = {};
 var blackListUserNamess = [];
 var blackListIp = [];
 var clientCommandList = ['help', 'pm'];
@@ -35,9 +36,6 @@ server.sockets.on(SOCKET_CONNECTION, function (socket){
   })
 
 
-
-
-
   socket.on(SOCKET_USER_REGISTRATION, function(username, callback){
 
     //uncomment for IP check on registration
@@ -49,6 +47,8 @@ server.sockets.on(SOCKET_CONNECTION, function (socket){
         callback(false, 'Username has been taken!');
       }else{
 
+        userList[username] = socket;
+
         usernameList[username] = username;
 
         socket.username = username;
@@ -56,7 +56,7 @@ server.sockets.on(SOCKET_CONNECTION, function (socket){
         server.emit(SOCKET_USER_MESSAGE, SERVER_USER, username + ' joined')
 
         callback(true);
-        console.log('New User: ', socket.username);
+        console.log('New User: ', userList[username].username);
 
       server.emit(USER_LIST_UPDATES, usernameList);
       }
@@ -157,6 +157,7 @@ function clientCommandCenter (message, socket){
       }
 
     }else{
+
       //if it just a regular message send out as normal
       server.emit(SOCKET_USER_MESSAGE, socket.username, message)
     }
