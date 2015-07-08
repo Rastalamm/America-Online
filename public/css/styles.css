@@ -5,8 +5,8 @@ body {
 
 p {
     font-family: 'Droid Sans', Helvetica, Arial, sans-serif;
-    font-size: 18px;
-    line-height: 25px;
+    font-size: 17px;
+    line-height: 20px;
 }
 
 ol li{
@@ -116,7 +116,7 @@ ol li{
 }
 
 .timetag{
-  font-size: 13px;
+  font-size: 12px;
   font-style: italic;
 }
 
