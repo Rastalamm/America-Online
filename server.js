@@ -48,6 +48,9 @@ server.sockets.on(SOCKET_CONNECTION, function (socket){
       }else{
 
         userList[username] = socket;
+        //gives the socket an empty blocklist/ignorelist for later
+        userList[username]['blockList'] = [];
+        userList[username]['ignoreList'] = [];
 
         usernameList[username] = username;
 
@@ -56,7 +59,8 @@ server.sockets.on(SOCKET_CONNECTION, function (socket){
         server.emit(SOCKET_USER_MESSAGE, SERVER_USER, username + ' joined')
 
         callback(true);
-        console.log('New User: ', userList[username].username);
+        console.log('userList', userList);
+        console.log('fasdafsdasffadsafsfs',userList[socket.username].username)
 
       server.emit(USER_LIST_UPDATES, usernameList);
       }
@@ -165,24 +169,41 @@ function clientCommandCenter (message, socket){
 }
 
 function unblockClient (to, message, socket){
+
+console.log('before',userList[socket.username]['blockList']);
+  if(userList[socket.username]['blockList'].indexOf(to) > -1){
+    userList[socket.username]['blockList'].splice(userList[socket.username]['blockList'].indexOf(to),1)
+  }
+
+  console.log('after',userList[socket.username]['blockList']);
+
   if(usernameList.hasOwnProperty(to)){
-    socket.emit(UNBLOCKED_USER, socket.username, to)
+    //socket.emit(UNBLOCKED_USER, socket.username, to)
     server.emit(SOCKET_USER_MESSAGE, SERVER_USER, (to + " has been unblocked by "+ socket.username + " bec/ " + message));
   }else{
     socket.emit(SOCKET_USER_MESSAGE, socket.username, 'Cannot find username');
   }
-
-
 }
 
 function blockClient (to, message, socket){
+
+  console.log('before',userList[socket.username]['blockList']);
+  userList[socket.username]['blockList'].push(to);
+  console.log('after',userList[socket.username]['blockList']);
+
+// //sending messages to users if they are blocked
   if(usernameList.hasOwnProperty(to)){
-    socket.emit(BLOCKED_USER, socket.username, to)
+    //socket.emit(BLOCKED_USER, socket.username, to)
     server.emit(SOCKET_USER_MESSAGE, SERVER_USER, (to + " has been blocked by "+ socket.username + " bec/ " + message));
   }else{
     socket.emit(SOCKET_USER_MESSAGE, socket.username, 'Cannot find username');
   }
+
 }
+
+// function filterBlockedOut (to, message, socket){
+
+// }
 
 function privateMessage(to, message, socket){
 
