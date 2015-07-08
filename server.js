@@ -8,7 +8,7 @@ var USER_LIST_UPDATES = 'update username list';
 var USER_MENTIONED = 'mentions';
 var SERVER_USER = 'Mr. Server';
 var KICKED_OUT_USER = 'kicked out user';
-var PRIVATE_MESSAGE = 'private message';
+
 
 var server = socketIO.listen(PORT);
 var usernameList = {};
@@ -157,7 +157,7 @@ function clientCommandCenter (message, socket){
       break;
 
       case '~unignore':
-        ignoreClient(to, message, socket)
+        unignoreClient(to, message, socket)
       break;
 
       default:
@@ -174,10 +174,40 @@ function clientCommandCenter (message, socket){
   }
 }
 
-function ignoreClient (to, message, socket){
+function blockClient (to, message, socket){
+  if(userList[socket.username]['blockList'].indexOf(to) > -1){
+      socket.emit(SOCKET_USER_MESSAGE, socket.username, 'User is already blocked');
+  }else{
+    userList[socket.username]['blockList'].push(to);
+  }
+
+ //status messages
+  if(usernameList.hasOwnProperty(to)){
+    server.emit(SOCKET_USER_MESSAGE, SERVER_USER, (to + " has been blocked by "+ socket.username + " bec/ " + message));
+  }else{
+    socket.emit(SOCKET_USER_MESSAGE, socket.username, 'Cannot find username');
+  }
+
+}
+
+function unblockClient (to, message, socket){
+
+  if(userList[socket.username]['blockList'].indexOf(to) > -1){
+    userList[socket.username]['blockList'].splice(userList[socket.username]['blockList'].indexOf(to),1)
+  }
+
+  //status messages
+  if(usernameList.hasOwnProperty(to)){
+    server.emit(SOCKET_USER_MESSAGE, SERVER_USER, (to + " has been unblocked by "+ socket.username + " bec/ " + message));
+  }else{
+    socket.emit(SOCKET_USER_MESSAGE, socket.username, 'Cannot find username');
+  }
+}
+
+function unignoreClient (to, message, socket){
 
   if(userList[socket.username]['ignoreList'].indexOf(to) > -1){
-    userList[socket.username]['ignoreList'].splice(userList[socket.username]['blockList'].indexOf(to),1)
+    userList[socket.username]['ignoreList'].splice(userList[socket.username]['ignoreList'].indexOf(to),1)
   }
 
   //status messages
@@ -187,6 +217,7 @@ function ignoreClient (to, message, socket){
     socket.emit(SOCKET_USER_MESSAGE, socket.username, 'Cannot find username');
   }
 }
+
 
 function ignoreClient (to, message, socket){
 
@@ -205,6 +236,26 @@ function ignoreClient (to, message, socket){
 
 }
 
+function privateMessage(to, message, socket){
+
+  var arr = Object.keys(userList);
+
+
+
+    if(userList[key]['blockList'].indexOf(socket.username) === -1){
+
+      console.log('fail');
+      userList[key].emit(SOCKET_USER_MESSAGE, socket.username, message);
+    }
+  }
+
+
+
+    socket.emit(SOCKET_USER_MESSAGE, socket.username, (to + ': '+ message));
+    message = '<span class ="pm_label">' + 'Private Message: ' + message + '</span>';
+    server.emit(PRIVATE_MESSAGE, socket.username, message, to);
+}
+
 function filterIgnored (message, socket){
 
   for(key in userList){
@@ -218,12 +269,6 @@ function filterIgnored (message, socket){
 }
 
 
-function privateMessage(to, message, socket){
-
-    socket.emit(SOCKET_USER_MESSAGE, socket.username, (to + ': '+ message));
-    message = '<span class ="pm_label">' + 'Private Message: ' + message + '</span>';
-    server.emit(PRIVATE_MESSAGE, socket.username, message, to);
-}
 
 function displayClientCommands(socket){
   var sentence = 'Type in ~ ';
