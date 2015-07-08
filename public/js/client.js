@@ -11,7 +11,7 @@
   var USER_LIST_UPDATES = 'update username list';
   var USER_MENTIONED = 'mentions';
   var KICKED_OUT_USER = 'kicked out user';
-  var PRIVATE_MESSAGE = 'private message';
+
 
   var SYSTEM = 'System';
   var socket = io.connect(SERVER_ADDRESS);
@@ -21,9 +21,9 @@
   //   message(SYSTEM, 'Connected to ' + SERVER_ADDRESS)
   // })
 
-  // socket.on(SOCKET_DISCONNECT, function(){
-  //   message(SYSTEM, 'Disconnect from ' + SERVER_ADDRESS)
-  // })
+  socket.on(SOCKET_DISCONNECT, function(){
+    kickedOutPage();
+  })
 
   // socket.on(SOCKET_RECONNECT, function(){
   //   message(SYSTEM, 'Reconnected to ' + SERVER_ADDRESS)
@@ -51,13 +51,6 @@
 
   socket.on(KICKED_OUT_USER, function (user, userMessage){
     kickedOutPage();
-  })
-
-
-  socket.on(PRIVATE_MESSAGE, function (user, userMessage, to){
-    if(to === clientUsername){
-      message(to, userMessage);
-    }
   })
 
   function message(from, message){
@@ -154,16 +147,6 @@
 
     message(from, userMessage)
   }
-
-
-
-
-
-
-
-
-
-
 
 
 })();
