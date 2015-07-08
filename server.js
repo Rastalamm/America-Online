@@ -9,11 +9,10 @@ var USER_MENTIONED = 'mentions';
 var SERVER_USER = 'Mr. Server';
 var KICKED_OUT_USER = 'kicked out user';
 var PRIVATE_MESSAGE = 'private message';
-var BLOCKED_USER = 'blocked user';
-var UNBLOCKED_USER = 'unblocked user';
 
 var server = socketIO.listen(PORT);
 var usernameList = {};
+var userList = {};
 var blackListUserNamess = [];
 var blackListIp = [];
 var clientCommandList = ['help', 'pm'];
@@ -35,11 +34,8 @@ server.sockets.on(SOCKET_CONNECTION, function (socket){
   })
 
 
-
-
-
   socket.on(SOCKET_USER_REGISTRATION, function(username, callback){
-
+    console.log(socket);
     //uncomment for IP check on registration
     if(blackListUserNamess.indexOf(username) > -1 /*|| blackListIp.indexOf(socket.address) > -1*/){
       callback(false, 'You\'ve been banned son');
@@ -49,6 +45,11 @@ server.sockets.on(SOCKET_CONNECTION, function (socket){
         callback(false, 'Username has been taken!');
       }else{
 
+        userList[username] = socket;
+        //gives the socket an empty blocklist/ignorelist for later
+        userList[username]['blockList'] = [];
+        userList[username]['ignoreList'] = [];
+
         usernameList[username] = username;
 
         socket.username = username;
@@ -56,7 +57,8 @@ server.sockets.on(SOCKET_CONNECTION, function (socket){
         server.emit(SOCKET_USER_MESSAGE, SERVER_USER, username + ' joined')
 
         callback(true);
-        console.log('New User: ', socket.username);
+
+        console.log('New User: ',userList[socket.username].username)
 
       server.emit(USER_LIST_UPDATES, usernameList);
       }
@@ -150,6 +152,14 @@ function clientCommandCenter (message, socket){
           unblockClient(to, message, socket)
         break;
 
+        case '~ignore':
+          ignoreClient(to, message, socket)
+        break;
+
+        case '~unignore':
+          ignoreClient(to, message, socket)
+        break;
+
         default:
           socket.emit(SOCKET_USER_MESSAGE, socket.username, 'Command not recognized');
         break;
@@ -157,31 +167,57 @@ function clientCommandCenter (message, socket){
       }
 
     }else{
+
       //if it just a regular message send out as normal
-      server.emit(SOCKET_USER_MESSAGE, socket.username, message)
+      filterIgnored(message, socket);
+      //server.emit(SOCKET_USER_MESSAGE, socket.username, message)
     }
 
 }
 
-function unblockClient (to, message, socket){
-  if(usernameList.hasOwnProperty(to)){
-    socket.emit(UNBLOCKED_USER, socket.username, to)
-    server.emit(SOCKET_USER_MESSAGE, SERVER_USER, (to + " has been unblocked by "+ socket.username + " bec/ " + message));
-  }else{
-    socket.emit(SOCKET_USER_MESSAGE, socket.username, 'Cannot find username');
+function ignoreClient (to, message, socket){
+
+  if(userList[socket.username]['ignoreList'].indexOf(to) > -1){
+    userList[socket.username]['ignoreList'].splice(userList[socket.username]['blockList'].indexOf(to),1)
   }
 
-
-}
-
-function blockClient (to, message, socket){
+  //status messages
   if(usernameList.hasOwnProperty(to)){
-    socket.emit(BLOCKED_USER, socket.username, to)
-    server.emit(SOCKET_USER_MESSAGE, SERVER_USER, (to + " has been blocked by "+ socket.username + " bec/ " + message));
+    server.emit(SOCKET_USER_MESSAGE, SERVER_USER, (to + " has been unignored by "+ socket.username + " bec/ " + message));
   }else{
     socket.emit(SOCKET_USER_MESSAGE, socket.username, 'Cannot find username');
   }
 }
+
+function ignoreClient (to, message, socket){
+
+  if(userList[socket.username]['ignoreList'].indexOf(to) > -1){
+      socket.emit(SOCKET_USER_MESSAGE, socket.username, 'User is already ignored');
+  }else{
+    userList[socket.username]['ignoreList'].push(to);
+  }
+
+ //status messages
+  if(usernameList.hasOwnProperty(to)){
+    server.emit(SOCKET_USER_MESSAGE, SERVER_USER, (to + " has been ignored by "+ socket.username + " bec/ " + message));
+  }else{
+    socket.emit(SOCKET_USER_MESSAGE, socket.username, 'Cannot find username');
+  }
+
+}
+
+function filterIgnored (message, socket){
+
+  for(key in userList){
+
+    if(userList[key]['ignoreList'].indexOf(socket.username) === -1){
+
+      console.log('fail');
+      userList[key].emit(SOCKET_USER_MESSAGE, socket.username, message);
+    }
+  }
+}
+
 
 function privateMessage(to, message, socket){
 

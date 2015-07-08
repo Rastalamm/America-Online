@@ -12,13 +12,10 @@
   var USER_MENTIONED = 'mentions';
   var KICKED_OUT_USER = 'kicked out user';
   var PRIVATE_MESSAGE = 'private message';
-  var BLOCKED_USER = 'blocked user';
-  var UNBLOCKED_USER = 'unblocked user';
 
   var SYSTEM = 'System';
   var socket = io.connect(SERVER_ADDRESS);
   var clientUsername;
-  var myBlockedList = [];
 
   // socket.on(SOCKET_CONNECT, function(){
   //   message(SYSTEM, 'Connected to ' + SERVER_ADDRESS)
@@ -59,31 +56,10 @@
 
   socket.on(PRIVATE_MESSAGE, function (user, userMessage, to){
     console.log('PM', myBlockedList.indexOf(user));
-    if(to === clientUsername && myBlockedList.indexOf(user) === -1 ){
+    if(to === clientUsername){
       message(to, userMessage);
     }
   })
-
-  socket.on(BLOCKED_USER, function (user, blockedUN){
-    addToBlockList(user, blockedUN);
-  })
-
-  socket.on(UNBLOCKED_USER, function (user, blockedUN){
-    removeFromBlockList(user, blockedUN);
-  })
-
-  function removeFromBlockList(user, blockedUN){
-    if(myBlockedList.indexOf(blockedUN) > -1){
-      myBlockedList.splice(myBlockedList.indexOf(blockedUN), 1);
-      console.log('bb list', myBlockedList);
-    }
-  }
-
-  function addToBlockList(user, blockedUN){
-    myBlockedList.push(blockedUN);
-
-    console.log('bb list', myBlockedList);
-  }
 
   function message(from, message){
       var newMessage = $('<p>');
@@ -168,7 +144,7 @@
 
   function checkForMention (from, userMessage){
 
-    var findThisUn = '@' + clientUsername + ' ';
+    var findThisUn = '@' + clientUsername;
 
     var mentionSpan = $('<span>',{
       text : clientUsername + ' ',
