@@ -59,7 +59,7 @@
         class : 'messagetag'
       });
       var fromTag = $('<b>', {
-        text : from + ':'
+        html : from + ':'
       });
       var messageTag = $('<span>', {
         html : message

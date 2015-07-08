@@ -9,6 +9,11 @@ p {
     line-height: 25px;
 }
 
+ol li{
+  list-style-type: none;
+  margin-bottom: 3%;
+}
+
 #registration{
   width: 500px;
   height: 500px;
@@ -40,17 +45,80 @@ p {
   font-size: 15px;
 }
 
+#chatroom{
+  display: inline-block;
+  position: fixed;
+  float: left;
+}
+
+
+#usersonline{
+  border: 1px solid gainsboro;
+  border-right: none;
+  width: 200px;
+  height: 500px;
+  overflow: auto;
+  display: inline-block !important;
+  float: left;
+}
+
+#usersonline > h3{
+  font-family: 'Droid Sans', Helvetica, Arial, sans-serif;
+  text-align: center;
+}
+
+
+#usersonline > li{
+  font-family: 'Droid Sans', Helvetica, Arial, sans-serif;
+}
+
+
 #chatlog p b {
   margin-right: 5px;
 }
 
 #chatlog{
   width: 500px;
-  height: 200px;
+  height: 500px;
   overflow: auto;
-  border: 1px solid black;
+  border: 1px solid gainsboro;
+  display: inline-block;
+  padding-left: 10px;
 }
 
+#message{
+  width: 400px;
+  margin-left: 29%;
+  height: 25px;
+  font-size: initial;
+}
+
+#send{
+  width: 89px;
+  height: 30px;
+  font-size: inherit;
+  border: none;
+  background-color: #1ea8e0;
+  padding-bottom: 1px;
+}
+
+.messagetag{
+
+}
+
+.mention{
+  font-weight: 700;
+  color: red;
+}
+
+.pm_label{
+  color: red;
+}
+
+.timetag{
+  font-size: 13px;
+  font-style: italic;
+}
 
 
 /* used for flashing
@@ -88,29 +156,3 @@ p {
     50% { opacity: 0.0; }
     100% { opacity: 1.0; }
 }*/
-
-#usersonline{
-  border: 1px solid black;
-  width: 200px;
-  height: 500px;
-  overflow: auto;
-
-}
-
-.messagetag{
-
-}
-
-.mention{
-  font-weight: 700;
-  color: red;
-}
-
-.pm_label{
-  color: red;
-}
-
-.timetag{
-  font-size: 13px;
-  font-style: italic;
-}
