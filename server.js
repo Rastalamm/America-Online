@@ -152,6 +152,14 @@ function clientCommandCenter (message, socket){
           unblockClient(to, message, socket)
         break;
 
+        case '~ignore':
+          ignoreClient(to, message, socket)
+        break;
+
+        case '~unignore':
+          ignoreClient(to, message, socket)
+        break;
+
         default:
           socket.emit(SOCKET_USER_MESSAGE, socket.username, 'Command not recognized');
         break;
@@ -161,71 +169,53 @@ function clientCommandCenter (message, socket){
     }else{
 
       //if it just a regular message send out as normal
-      filterBlockedOut(message, socket);
+      filterIgnored(message, socket);
       //server.emit(SOCKET_USER_MESSAGE, socket.username, message)
     }
 
 }
 
-function unblockClient (to, message, socket){
+function ignoreClient (to, message, socket){
 
-console.log('before',userList[socket.username]['blockList']);
-  if(userList[socket.username]['blockList'].indexOf(to) > -1){
-    userList[socket.username]['blockList'].splice(userList[socket.username]['blockList'].indexOf(to),1)
+  if(userList[socket.username]['ignoreList'].indexOf(to) > -1){
+    userList[socket.username]['ignoreList'].splice(userList[socket.username]['blockList'].indexOf(to),1)
   }
 
-  console.log('after',userList[socket.username]['blockList']);
-
+  //status messages
   if(usernameList.hasOwnProperty(to)){
-
-    server.emit(SOCKET_USER_MESSAGE, SERVER_USER, (to + " has been unblocked by "+ socket.username + " bec/ " + message));
+    server.emit(SOCKET_USER_MESSAGE, SERVER_USER, (to + " has been unignored by "+ socket.username + " bec/ " + message));
   }else{
     socket.emit(SOCKET_USER_MESSAGE, socket.username, 'Cannot find username');
   }
 }
 
-function blockClient (to, message, socket){
+function ignoreClient (to, message, socket){
 
-  if(userList[socket.username]['blockList'].indexOf(to) > -1){
-      socket.emit(SOCKET_USER_MESSAGE, socket.username, 'User is already blocked');
+  if(userList[socket.username]['ignoreList'].indexOf(to) > -1){
+      socket.emit(SOCKET_USER_MESSAGE, socket.username, 'User is already ignored');
   }else{
-
+    userList[socket.username]['ignoreList'].push(to);
   }
 
-  console.log('before',userList[socket.username]['blockList']);
-  userList[socket.username]['blockList'].push(to);
-  console.log('after',userList[socket.username]['blockList']);
-
-// //sending messages to users if they are blocked
+ //status messages
   if(usernameList.hasOwnProperty(to)){
-    server.emit(SOCKET_USER_MESSAGE, SERVER_USER, (to + " has been blocked by "+ socket.username + " bec/ " + message));
+    server.emit(SOCKET_USER_MESSAGE, SERVER_USER, (to + " has been ignored by "+ socket.username + " bec/ " + message));
   }else{
     socket.emit(SOCKET_USER_MESSAGE, socket.username, 'Cannot find username');
   }
 
 }
 
-function filterBlockedOut (message, socket){
-
-  console.log('blok list', userList['aa']['blockList']);
-  console.log('username', socket.username);
-  console.log('in there?', userList['aa']['blockList'].indexOf(socket.username));
+function filterIgnored (message, socket){
 
   for(key in userList){
 
-    if(userList[key]['blockList'].indexOf(socket.username) === -1){
-      //dont send the message to the socket
-      //send to all other users
+    if(userList[key]['ignoreList'].indexOf(socket.username) === -1){
+
       console.log('fail');
       userList[key].emit(SOCKET_USER_MESSAGE, socket.username, message);
-    }else{
-      //send to all users
-      console.log('else');
-      //server.emit(SOCKET_USER_MESSAGE, socket.username, message);
     }
   }
-
-
 }
 
 

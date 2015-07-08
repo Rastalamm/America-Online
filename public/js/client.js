@@ -56,7 +56,7 @@
 
   socket.on(PRIVATE_MESSAGE, function (user, userMessage, to){
     console.log('PM', myBlockedList.indexOf(user));
-    if(to === clientUsername && myBlockedList.indexOf(user) === -1 ){
+    if(to === clientUsername){
       message(to, userMessage);
     }
   })
@@ -144,7 +144,7 @@
 
   function checkForMention (from, userMessage){
 
-    var findThisUn = '@' + clientUsername + ' ';
+    var findThisUn = '@' + clientUsername;
 
     var mentionSpan = $('<span>',{
       text : clientUsername + ' ',
