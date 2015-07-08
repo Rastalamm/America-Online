@@ -55,6 +55,10 @@
 
 }
 
+.messagetag{
+
+}
+
 .mention{
   font-weight: 700;
   color: red;
@@ -62,4 +66,9 @@
 
 .pm_label{
   color: red;
+}
+
+.timetag{
+  font-size: 13px;
+  font-style: italic;
 }

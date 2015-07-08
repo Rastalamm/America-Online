@@ -1,6 +1,7 @@
 (function (){
 
-  var SERVER_ADDRESS = 'http://localhost:8000';
+  //var SERVER_ADDRESS = 'http://localhost:8000';
+  var SERVER_ADDRESS = 'http://10.0.1.24:8000';
   var SOCKET_CONNECT = 'connect';
   var SOCKET_DISCONNECT = 'disconnect';
   var SOCKET_RECONNECT = 'reconnect';
@@ -54,17 +55,24 @@
   })
 
   function message(from, message){
-      var newMessage = $('<p>');
+      var newMessage = $('<p>', {
+        class : 'messagetag'
+      });
       var fromTag = $('<b>', {
         text : from + ':'
       });
       var messageTag = $('<span>', {
         html : message
       });
+      var timeTag = $('<div>', {
+        class : 'timetag',
+        html : moment().format('MMMM Do YYYY, h:mm:ss a')
+      });
 
 
       newMessage.append(fromTag);
       newMessage.append(messageTag);
+      newMessage.append(timeTag);
     $('#chatlog').append(newMessage).get(0).scrollTop = 1000000000;
   }
 

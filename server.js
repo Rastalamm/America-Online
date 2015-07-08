@@ -13,7 +13,7 @@ var KICKED_OUT_USER = 'kicked out user';
 var server = socketIO.listen(PORT);
 var usernameList = {};
 var userList = {};
-var blackListUserNamess = [];
+var blackListUserNamess = ['admin', 'ADMIN'];
 var blackListIp = [];
 var clientCommandList = ['help', 'pm', 'block', 'unblock', 'ignore', 'unignore'];
 
