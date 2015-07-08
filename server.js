@@ -238,22 +238,31 @@ function ignoreClient (to, message, socket){
 
 function privateMessage(to, message, socket){
 
-  var arr = Object.keys(userList);
 
+    if(userList[to]['ignoreList'].indexOf(socket.username) === -1){
 
+      if(userList[to]['blockList'].indexOf(socket.username) === -1){
 
-    if(userList[key]['blockList'].indexOf(socket.username) === -1){
+        console.log('to the sender');
+        socket.emit(SOCKET_USER_MESSAGE, socket.username, (to + ': '+ message));
 
-      console.log('fail');
-      userList[key].emit(SOCKET_USER_MESSAGE, socket.username, message);
+        console.log('to the user');
+          message = '<span class ="pm_label">' + 'Private Message: ' + message + '</span>';
+
+        userList[to].emit(SOCKET_USER_MESSAGE, socket.username, message);
+      }else{
+        socket.emit(SOCKET_USER_MESSAGE, socket.username, (to + ': is blocking you'));
+      }
+
+    }else{
+      socket.emit(SOCKET_USER_MESSAGE, socket.username, (to + ': is ignoring you'));
     }
-  }
+
+
 
 
 
     socket.emit(SOCKET_USER_MESSAGE, socket.username, (to + ': '+ message));
-    message = '<span class ="pm_label">' + 'Private Message: ' + message + '</span>';
-    server.emit(PRIVATE_MESSAGE, socket.username, message, to);
 }
 
 function filterIgnored (message, socket){
