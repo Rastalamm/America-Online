@@ -15,7 +15,7 @@ var usernameList = {};
 var userList = {};
 var blackListUserNamess = [];
 var blackListIp = [];
-var clientCommandList = ['help', 'pm'];
+var clientCommandList = ['help', 'pm', 'block', 'unblock', 'ignore', 'unignore'];
 
 
 server.sockets.on(SOCKET_CONNECTION, function (socket){
@@ -238,31 +238,25 @@ function ignoreClient (to, message, socket){
 
 function privateMessage(to, message, socket){
 
-
+  if(Object.keys(userList).indexOf(to) === -1){
+    socket.emit(SOCKET_USER_MESSAGE, SERVER_USER, 'No user found');
+  }else{
     if(userList[to]['ignoreList'].indexOf(socket.username) === -1){
-
       if(userList[to]['blockList'].indexOf(socket.username) === -1){
 
-        console.log('to the sender');
+        //sends the pm to the person who originated it
         socket.emit(SOCKET_USER_MESSAGE, socket.username, (to + ': '+ message));
 
-        console.log('to the user');
-          message = '<span class ="pm_label">' + 'Private Message: ' + message + '</span>';
-
+        message = '<span class ="pm_label">' + 'pm from '+ socket.username + ': ' + message + '</span>';
+        //sends the pm to the person intended
         userList[to].emit(SOCKET_USER_MESSAGE, socket.username, message);
       }else{
         socket.emit(SOCKET_USER_MESSAGE, socket.username, (to + ': is blocking you'));
       }
-
     }else{
       socket.emit(SOCKET_USER_MESSAGE, socket.username, (to + ': is ignoring you'));
     }
-
-
-
-
-
-    socket.emit(SOCKET_USER_MESSAGE, socket.username, (to + ': '+ message));
+  }
 }
 
 function filterIgnored (message, socket){
