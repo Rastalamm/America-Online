@@ -35,8 +35,7 @@ server.sockets.on(SOCKET_CONNECTION, function (socket){
 
 
   socket.on(SOCKET_USER_REGISTRATION, function(username, callback){
-    console.log(socket);
-    //uncomment for IP check on registration
+      //uncomment for IP check on registration
     if(blackListUserNamess.indexOf(username) > -1 /*|| blackListIp.indexOf(socket.address) > -1*/){
       callback(false, 'You\'ve been banned son');
     }else{
@@ -45,25 +44,34 @@ server.sockets.on(SOCKET_CONNECTION, function (socket){
         callback(false, 'Username has been taken!');
       }else{
 
-        userList[username] = socket;
-        //gives the socket an empty blocklist/ignorelist for later
-        userList[username]['blockList'] = [];
-        userList[username]['ignoreList'] = [];
+        if(username.indexOf(' ') > -1){
+          callback(false, 'Usernames are spaceless');
+        }else{
 
-        usernameList[username] = username;
+          if(username.length > 16){
+            callback(false, 'Username must be less than 16 characters');
+          }else{
 
-        socket.username = username;
+            userList[username] = socket;
+            //gives the socket an empty blocklist/ignorelist for later
+            userList[username]['blockList'] = [];
+            userList[username]['ignoreList'] = [];
 
-        server.emit(SOCKET_USER_MESSAGE, SERVER_USER, username + ' joined')
+            usernameList[username] = username;
 
-        callback(true);
+            socket.username = username;
 
-        console.log('New User: ',userList[socket.username].username)
+            server.emit(SOCKET_USER_MESSAGE, SERVER_USER, username + ' joined')
 
-      server.emit(USER_LIST_UPDATES, usernameList);
+            callback(true);
+
+            console.log('New User: ',userList[socket.username].username)
+
+            server.emit(USER_LIST_UPDATES, usernameList);
+          }
+        }
       }
     }
-
   });
 
 

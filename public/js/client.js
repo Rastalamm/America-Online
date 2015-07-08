@@ -59,7 +59,7 @@
         class : 'messagetag'
       });
       var fromTag = $('<b>', {
-        text : from + ':'
+        html : from + ':'
       });
       var messageTag = $('<span>', {
         html : message
@@ -100,6 +100,7 @@
         changeStateOfChatRoom();
       }
       else{
+        $('#username').val('');
         $('#username_error').text(message);
       }
     });

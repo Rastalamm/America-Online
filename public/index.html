@@ -4,20 +4,31 @@
   <meta charset="UTF-8">
   <title>Broadcast Client</title>
   <link rel="stylesheet" href="css/styles.css">
+  <link href="http://fonts.googleapis.com/css?family=Droid+Serif" rel="stylesheet" type="text/css">
+  <link href="http://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet" type="text/css">
 </head>
 <body>
 
 <div id="registration">
-  <h2>Please type in your nickname and press enter</h2>
-  <h3 id="username_error" class="error"></h3>
+  <h2>Choose your nickname</h2>
   <form action="" id="registration_form">
-    <input type="text" id="username">
-    <button>Sign In</button>
-  </form>
+    <input type="text" id="username" autocomplete="off">
+    <!-- <button id="username_button">Sign In</button> -->
+   </form>
+  <h3 id="username_error" class="error"></h3>
 </div>
 
 
 <div id="chatroom">
+
+  <div id="usersonline">
+    <h3>Users Online</h3>
+    <div id="userhouse">
+      <ol id="userlist"></ol>
+    </div>
+
+  </div>
+
   <div id="chatlog"></div>
   <form id="messageform">
     <input type="text" id="message"
@@ -26,13 +37,6 @@
   </form>
 </div>
 
-<div id="usersonline">
-  <h3>Users Online</h3>
-  <div id="userhouse">
-    <ul id="userlist"></ul>
-  </div>
-
-</div>
 
 
   <script src="bower_components/jquery/dist/jquery.min.js"></script>
